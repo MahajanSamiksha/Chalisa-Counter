@@ -1,8 +1,9 @@
 # Normalize to LF in the repository; let Git decide the working-copy ending.
 * text=auto
 
-# These must keep LF even when checked out on Windows: the Gradle wrapper script
-# and the CI workflows run on Linux, where CRLF breaks the shebang line.
+# These must keep LF even when checked out on Windows: shell scripts run on
+# Linux and macOS, where a CRLF shebang line breaks execution. Keeping the yml
+# rules means CI config added later is correct from the first commit.
 gradlew        text eol=lf
 *.sh           text eol=lf
 *.yml          text eol=lf

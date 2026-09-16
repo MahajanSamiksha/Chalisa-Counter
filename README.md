@@ -7,54 +7,40 @@ A small, offline Android app for tracking a Hanuman Chalisa sadhana — 100 reci
   <img src="docs/screenshot.png" alt="The counter screen, showing per-day rows and overall progress" width="320">
 </p>
 
-## Why you might trust it with your practice
+The app is distributed as an APK shared directly with interested people, not through the Play Store.
+This README is the working notes for building and sharing it.
+
+## What the app does for its users
 
 - **No permissions at all.** The manifest declares none. Everything is stored locally in a Room
-  database on your device.
-- **No network access, no analytics, no accounts.** Your counts never leave your phone unless you
-  export them yourself.
-- **Open source under the MIT license.** You can read every line, and rebuild the APK yourself to
-  confirm it does what this README says.
+  database on the device.
+- **No network access, no analytics, no accounts.** Counts never leave the phone unless the user
+  exports them.
+- **Export to a text file** at any time, to a location the user picks.
 
-## Install
+## Building
 
-Download the latest `.apk` from the [Releases page](../../releases) and open it on your device.
-
-Requirements: **Android 7.0 (API 24) or newer**.
-
-Two things to know about installing outside the Play Store:
-
-- Android will warn you about installing from an **unknown source**. That warning is expected for
-  any sideloaded app; you will need to allow it for your browser or file manager.
-- **Sideloaded apps do not update themselves.** Check the Releases page when you want a newer
-  version.
-
-Prefer to build it yourself? See below — that is the surest way to know what you are running.
-
-## Building from source
-
-You will need **JDK 17 or newer** (this project is developed against JDK 21) and the Android SDK.
-The simplest route is [Android Studio](https://developer.android.com/studio), which bundles both;
-open the project folder and it will sync automatically.
-
-From the command line:
+Requires **JDK 17 or newer** (developed against JDK 21) and the Android SDK. The simplest route is
+[Android Studio](https://developer.android.com/studio), which bundles both; open the project folder
+and it syncs automatically.
 
 ```bash
 ./gradlew test           # run the unit tests
-./gradlew assembleDebug  # build a debug APK
+./gradlew assembleDebug  # build a debug APK for local testing
 ```
 
-The debug APK lands in `app/build/outputs/apk/debug/`. It is signed with the standard Android debug
-key, which is fine for trying the app on your own device but **not** suitable for sharing — see the
-note under [Releasing](#releasing).
+Gradle reads the SDK location from `local.properties`, which Android Studio creates. It is
+gitignored because it holds a machine-specific absolute path.
 
-Gradle reads your SDK location from `local.properties`, which Android Studio creates for you. It is
-gitignored because it holds an absolute path specific to your machine.
+The debug APK in `app/build/outputs/apk/debug/` is fine on your own device but **must not be
+shared**: it is `debuggable`, and it is signed with the standard Android debug key, which is public.
+Anyone could sign an APK with that key and Android would accept it as a legitimate update. Share
+only release builds, per the next section.
 
 ## Project layout
 
-The code follows a domain / data / presentation split, with dependencies pointing inward — the
-domain layer knows nothing about Room or Compose.
+Domain / data / presentation split, with dependencies pointing inward — the domain layer knows
+nothing about Room or Compose.
 
 ```
 app/src/main/java/com/hanumanchalisa/counter/
@@ -74,10 +60,10 @@ Unit tests in `app/src/test/` cover the use cases and the ViewModel, using hand-
 Room's exported schema lives in `app/schemas/` and is committed deliberately, so any future schema
 change shows up as a reviewable diff.
 
-## Releasing
+## One-time signing setup
 
-Release builds are signed with a keystore that is **not** in this repository. If you are forking
-this project, generate your own:
+Release builds need a keystore, which is **not** in this repository. Generate one, choosing your own
+password when prompted:
 
 ```bash
 keytool -genkeypair -v -keystore chalisa-release.jks \
@@ -87,53 +73,79 @@ keytool -genkeypair -v -keystore chalisa-release.jks \
 Then copy `keystore.properties.example` to `keystore.properties` and fill in the password and alias
 you chose. Both the `.jks` and `keystore.properties` are gitignored.
 
-> **Back up the keystore somewhere safe.** Android identifies an app by its signature, so if you
-> lose the key you cannot ship an update that installs over an existing copy — users would have to
-> uninstall and lose their data. And never commit it: with the key, anyone can sign an APK that
-> your users' devices will accept as a legitimate update.
+> **Back up the keystore and its password somewhere durable.** Android identifies an app by its
+> signature. Lose the key and you cannot ship an update that installs over an existing copy —
+> users would have to uninstall first, which is exactly the case where their saved counts are at
+> risk. Never commit it either: with the key, anyone can sign an APK that your users' devices will
+> accept as a legitimate update.
 
-With `keystore.properties` in place, `./gradlew assembleRelease` produces a signed APK in
-`app/build/outputs/apk/release/`. Without it, the build still succeeds but the APK is **unsigned**
-and Android will refuse to install it. The debug key is never used as a fallback, by design.
+## Cutting a release
 
-### Automated releases
+1. **Bump the version** in `app/build.gradle.kts`. `versionCode` must increase every single time —
+   Android uses it, not `versionName`, to decide whether a build is an update. Ship two APKs with
+   the same `versionCode` and the second will not install over the first.
 
-`.github/workflows/release.yml` builds and publishes a signed APK when you push a version tag:
+2. **Build and test:**
 
-```bash
-# bump versionCode and versionName in app/build.gradle.kts first
-git tag v1.0.0
-git push origin v1.0.0
-```
+   ```bash
+   ./gradlew test assembleRelease
+   ```
 
-`versionCode` must increase with every release — Android uses it, not `versionName`, to decide
-whether a build is an update.
+   The signed APK lands at `app/build/outputs/apk/release/app-release.apk`, around 8 MB. If you see
+   `app-release-unsigned.apk` instead, `keystore.properties` is missing or its `storeFile` is blank —
+   an unsigned APK will not install. The debug key is deliberately never used as a fallback.
 
-The workflow needs four repository secrets under **Settings → Secrets and variables → Actions**:
+3. **Rename it so versions are tellable apart:**
 
-| Secret | Value |
-| --- | --- |
-| `KEYSTORE_BASE64` | Your `.jks` file, base64 encoded |
-| `KEYSTORE_PASSWORD` | The store password |
-| `KEY_ALIAS` | The key alias, e.g. `chalisa` |
-| `KEY_PASSWORD` | The key password |
+   ```bash
+   cp app/build/outputs/apk/release/app-release.apk ~/chalisa-counter-v1.0.0.apk
+   ```
 
-To produce the base64 blob:
+   Skip this and recipients accumulate `app-release.apk`, `app-release(1).apk`, with no idea which
+   is newer.
 
-```bash
-# Windows (PowerShell)
-[Convert]::ToBase64String([IO.File]::ReadAllBytes("chalisa-release.jks")) > keystore.txt
+4. **Upload to Google Drive, Dropbox, or OneDrive** and share the link. Note that **Gmail blocks
+   `.apk` attachments**, so send the link rather than the file — zipping it to dodge the filter just
+   adds a step for the recipient.
 
-# macOS / Linux
-base64 -w 0 chalisa-release.jks > keystore.txt
-```
+5. **Tag the release locally** so you can reproduce exactly what you sent:
 
-Storing the keystore as a secret means it lives on GitHub as well as your machine. If you would
-rather it stayed only on your machine, delete `release.yml` and build releases locally instead.
+   ```bash
+   git tag v1.0.0
+   ```
 
-`.github/workflows/test.yml` runs the unit tests and a debug build on every push and pull request,
-and needs no secrets.
+### What to tell recipients
+
+Something like:
+
+> Android 7.0 or newer. Tap the link, open the downloaded file, and allow installing from an
+> unknown source when asked — that prompt is normal for any app installed outside the Play Store.
+> Play Protect may show a second warning because it has no reputation data for this app.
+>
+> The app updates only when I send a new link, so hit **Export** before reinstalling if you ever
+> need to — that saves your counts to a text file.
+
+That last point matters: the export feature is the only safety net for someone's 40-day practice if
+a reinstall ever loses the app's data.
+
+## Distribution notes
+
+Sharing the APK without the source has some consequences worth being aware of:
+
+- **Recipients are trusting you personally.** With no source published and no store listing, there
+  is no way for anyone to verify that a devotional counter is not doing something else. That is a
+  reasonable basis among friends and family; it does not extend to strangers.
+- **No automatic updates**, and no notification when a new version exists.
+- **F-Droid is not an option** — it requires public source and reproducible builds.
+- **Default copyright applies.** Nobody may redistribute the APK without your permission, so if you
+  are happy for people to forward it to friends, say so explicitly when you share it.
+
+If you later decide to publish the source, the `LICENSE` file already grants MIT terms and this repo
+is ready to push as-is. GitHub Actions workflows for testing on push and publishing signed APKs to
+GitHub Releases were removed in the commit that introduced this section — recover them from git
+history rather than rewriting them.
 
 ## License
 
-[MIT](LICENSE) — © 2026 Samiksha Mahajan. Use it, change it, share it.
+The source is licensed [MIT](LICENSE) should you choose to publish it. Until then it is unpublished
+and default copyright applies to the APK you distribute.
