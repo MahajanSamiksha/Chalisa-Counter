@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Only the colours the launch theme needs; in-app colours live in Compose's theme. -->
+<resources>
+    <color name="saffron_light">#FFDDB8</color>
+    <color name="warm_surface">#FFFBF6</color>
+    <color name="saffron_container_dark">#5C2C00</color>
+    <color name="warm_surface_dark">#1F1A16</color>
+</resources>

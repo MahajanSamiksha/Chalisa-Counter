@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark-mode launch theme, so start-up does not flash a light background before Compose draws. -->
+    <style name="Theme.HanumanChalisaCounter" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/warm_surface_dark</item>
+        <item name="android:statusBarColor">@color/saffron_container_dark</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

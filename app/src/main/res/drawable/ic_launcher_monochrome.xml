@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Monochrome variant of the gada for Android 13+ themed icons. Android supplies the colour, so
+    every shape is drawn in solid black and the design relies on silhouette alone.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Mace head -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M54,22 m-17,0 a17,17 0 1 0 34,0 a17,17 0 1 0 -34,0 z" />
+
+    <!-- Collar between head and handle -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M45,38 h18 a2.5,2.5 0 0 1 2.5,2.5 v4 a2.5,2.5 0 0 1 -2.5,2.5 h-18 a2.5,2.5 0 0 1 -2.5,-2.5 v-4 a2.5,2.5 0 0 1 2.5,-2.5 z" />
+
+    <!-- Second collar band -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M47.5,49.5 h13 a2,2 0 0 1 2,2 v3 a2,2 0 0 1 -2,2 h-13 a2,2 0 0 1 -2,-2 v-3 a2,2 0 0 1 2,-2 z" />
+
+    <!-- Handle -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M50.5,58 h7 a2,2 0 0 1 2,2 v22 a3.5,3.5 0 0 1 -3.5,3.5 h-4 a3.5,3.5 0 0 1 -3.5,-3.5 v-22 a2,2 0 0 1 2,-2 z" />
+</vector>

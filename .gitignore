@@ -1,0 +1,27 @@
+### Android / Gradle build output ###
+# No leading slash: this must match app/build/ as well as the root build/ directory.
+build/
+.gradle/
+.kotlin/
+.cxx/
+.externalNativeBuild/
+/captures
+
+### Signing credentials — never commit these ###
+# Losing the keystore means you can never publish an update existing users can install.
+# Committing it means anyone can sign an APK that impersonates yours.
+*.jks
+*.keystore
+keystore.properties
+
+### Machine-specific ###
+# Contains an absolute path to your local Android SDK.
+local.properties
+
+### IDE ###
+/.idea
+*.iml
+
+### OS ###
+.DS_Store
+Thumbs.db

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Chalisa Counter</string>
+    <string name="app_title">Hanuman Chalisa</string>
+
+    <string name="day_label">Day %1$d</string>
+    <string name="total_of_target">%1$d / %2$d</string>
+    <plurals name="remaining_count">
+        <item quantity="one">%1$d more to reach the target</item>
+        <item quantity="other">%1$d more to reach the target</item>
+    </plurals>
+    <string name="target_reached">Target reached. Jai Hanuman!</string>
+
+    <string name="increment_day">Add one recitation to day %1$d</string>
+    <string name="decrement_day">Remove one recitation from day %1$d</string>
+
+    <string name="export_button">Export</string>
+    <string name="export_button_description">Export all counts to a text file</string>
+    <string name="export_succeeded">Saved to %1$s</string>
+    <string name="export_failed">Could not save the file. Your counts are safe — please try again.</string>
+
+    <string name="reset_button">Reset all counts</string>
+    <string name="reset_dialog_title">Reset all counts?</string>
+    <string name="reset_dialog_message">This clears the count for all 40 days and starts a fresh cycle. This cannot be undone.</string>
+    <string name="reset_dialog_confirm">Reset</string>
+    <string name="reset_dialog_cancel">Cancel</string>
+</resources>
