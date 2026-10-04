@@ -4,7 +4,7 @@ A small, offline Android app for tracking a Hanuman Chalisa sadhana — 100 reci
 40 days. Tap to count, and export the whole cycle to a text file when you are done.
 
 <p align="center">
-  <img src="docs/screenshot.png" alt="The counter screen, showing per-day rows and overall progress" width="320">
+  <img src="docs/screenshot.jpeg" alt="The counter screen, showing per-day rows and overall progress" width="320">
 </p>
 
 The app is distributed as an APK shared directly with interested people, not through the Play Store.

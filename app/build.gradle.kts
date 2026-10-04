@@ -49,6 +49,7 @@ android {
             // signing config here — the debug key is public, so anyone could forge an update.
             signingConfig = if (hasReleaseSigning) signingConfigs.getByName("release") else null
 
+            isDebuggable = false
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
