@@ -1,7 +1,6 @@
 # Chalisa Counter
 
-A small, offline Android app for tracking a Hanuman Chalisa sadhana — 100 recitations a day across
-40 days. Tap to count, and export the whole cycle to a text file when you are done.
+An offline Android app I built for myself, friends, and family to track our 40-day Hanuman Chalisa sadhana—100 recitations a day, with progress tracking. Tap to increase or decrease the count for each day, reset the counter, and export the whole cycle to a text file when you are done.
 
 <p align="center">
   <img src="docs/screenshot.jpeg" alt="The counter screen, showing per-day rows and overall progress" width="320">
