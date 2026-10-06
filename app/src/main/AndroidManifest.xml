@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    No <uses-permission> entries at all: the app stores everything locally and never uses the
-    network, so it needs no permissions from you.
+    No <uses-permission> entries: counts are stored in private app storage. Android manages backup
+    and device transfer, and export uses a user-selected document provider, so no app permissions
+    are needed. A selected cloud document provider may upload an exported file.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 

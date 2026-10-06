@@ -2,11 +2,13 @@ package com.hanumanchalisa.counter.presentation.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -19,9 +21,14 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -41,8 +48,8 @@ import com.hanumanchalisa.counter.presentation.ui.theme.HanumanChalisaTheme
  * The single screen of the app: fixed progress header, scrollable Day 1 … Day 40 list, and a Reset
  * button pinned to the bottom.
  *
- * Stateless by design — it renders [uiState] and forwards events. All state lives in the ViewModel,
- * so this composable is previewable and the screen has one source of truth.
+ * Renders [uiState] and forwards counter events. Counter state lives in the ViewModel; the
+ * informational dialog keeps its own visibility state.
  */
 @Composable
 fun CounterScreen(
@@ -54,10 +61,12 @@ fun CounterScreen(
     onResetDismissed: () -> Unit,
     onExportRequested: () -> Unit,
     onExportStatusShown: () -> Unit,
+    onPrivacyPolicyRequested: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val progress = uiState.progress
     val snackbarHostState = remember { SnackbarHostState() }
+    var isDataInfoVisible by rememberSaveable { mutableStateOf(false) }
 
     // Show the export outcome once, then tell the ViewModel it has been seen so a rotation does not
     // replay it. Keyed on the status object so each new outcome triggers a fresh message.
@@ -84,8 +93,27 @@ fun CounterScreen(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             // Header sits outside the list so the total stays visible while scrolling.
-            if (progress != null) {
-                ProgressHeader(progress = progress)
+            Column(modifier = Modifier.fillMaxWidth().statusBarsPadding()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+                    horizontalArrangement = Arrangement.End,
+                ) {
+                    TextButton(
+                        onClick = onPrivacyPolicyRequested,
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Text(stringResource(R.string.privacy_policy_button))
+                    }
+                    TextButton(
+                        onClick = { isDataInfoVisible = true },
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Text(stringResource(R.string.data_info_button))
+                    }
+                }
+                if (progress != null) {
+                    ProgressHeader(progress = progress)
+                }
             }
         },
         bottomBar = {
@@ -164,6 +192,10 @@ fun CounterScreen(
         }
     }
 
+    if (isDataInfoVisible) {
+        DataInfoDialog(onDismiss = { isDataInfoVisible = false })
+    }
+
     if (uiState.isResetDialogVisible) {
         ResetConfirmDialog(
             onConfirm = onResetConfirmed,
@@ -193,6 +225,7 @@ private fun CounterScreenPreview() {
             onResetDismissed = {},
             onExportRequested = {},
             onExportStatusShown = {},
+            onPrivacyPolicyRequested = {},
         )
     }
 }
