@@ -10,8 +10,8 @@ An offline Android app for tracking a 40-day Hanuman Chalisa sadhana, with a tar
 
 Requires Android 7.0 or newer.
 
-1. APK can be downloaded from (D:\Personal-Projects\ChalisaCounter\app\build\outputs\apk\release\app-release.apk)
-2. Or the app can be installed from Google Play Store.
+APK can be downloaded from (app/release/app-release.apk) Or 
+The app can be installed from Google Play Store.
 
 ## Track your recitations
 
