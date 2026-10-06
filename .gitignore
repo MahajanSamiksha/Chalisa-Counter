@@ -1,5 +1,6 @@
 ### Android / Gradle build output ###
 # No leading slash: this must match app/build/ as well as the root build/ directory.
+build/
 .gradle/
 .kotlin/
 .cxx/
