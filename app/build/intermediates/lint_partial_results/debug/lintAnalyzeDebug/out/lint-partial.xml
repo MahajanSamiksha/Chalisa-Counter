@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 8.13.2" type="partial_results">
+    <map id="UnsafeIntentLaunch">
+            <map id="unprotected">
+                <entry
+                    name="com.hanumanchalisa.counter.MainActivity"
+                    boolean="true"/>
+            </map>
+    </map>
+    <map id="UnusedResources">
+        <entry
+            name="model"
+            string="color[saffron_light(U),warm_surface(U),saffron_container_dark(U),warm_surface_dark(U)],drawable[ic_launcher_background(U),ic_launcher_foreground(U),ic_launcher_monochrome(U)],mipmap[ic_launcher(U),ic_launcher_round(U)],plurals[remaining_count(U)],string[app_name(U),app_title(U),day_label(U),total_of_target(U),target_reached(U),increment_day(U),decrement_day(U),export_button(U),export_button_description(U),export_succeeded(U),export_failed(U),reset_button(U),reset_dialog_title(U),reset_dialog_message(U),reset_dialog_confirm(U),reset_dialog_cancel(U)],style[Theme_HanumanChalisaCounter(U)],xml[data_extraction_rules(U),backup_rules(U)];7^4^5^6,8^4^5^6,1a^1^0^3^2;;;"/>
+    </map>
+
+</incidents>

@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.hanumanchalisa.counter.app-mergeReleaseResources-38:/values-v30/values-v30.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\smahajan\\.gradle\\caches\\8.14.3\\transforms\\2a24c580d823a0dc78c45a884c3491fc\\transformed\\material3\\res\\values-v30\\values-v30.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "72",
+                        "endOffsets": "123"
+                    }
+                }
+            ]
+        }
+    ]
+}

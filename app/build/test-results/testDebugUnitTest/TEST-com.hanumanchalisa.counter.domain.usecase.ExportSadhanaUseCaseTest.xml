@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hanumanchalisa.counter.domain.usecase.ExportSadhanaUseCaseTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-10-06T16:51:41.710Z" hostname="L-2DN9524" time="0.032">
+  <properties/>
+  <testcase name="falls back to the suggested name when none is reported" classname="com.hanumanchalisa.counter.domain.usecase.ExportSadhanaUseCaseTest" time="0.015"/>
+  <testcase name="returns the name the destination reports" classname="com.hanumanchalisa.counter.domain.usecase.ExportSadhanaUseCaseTest" time="0.002"/>
+  <testcase name="a write failure propagates so the caller can report it" classname="com.hanumanchalisa.counter.domain.usecase.ExportSadhanaUseCaseTest" time="0.003"/>
+  <testcase name="mime type is plain text" classname="com.hanumanchalisa.counter.domain.usecase.ExportSadhanaUseCaseTest" time="0.0"/>
+  <testcase name="suggested file name is stamped and safe for a file system" classname="com.hanumanchalisa.counter.domain.usecase.ExportSadhanaUseCaseTest" time="0.001"/>
+  <testcase name="report notes when the target has been reached" classname="com.hanumanchalisa.counter.domain.usecase.ExportSadhanaUseCaseTest" time="0.003"/>
+  <testcase name="writes the report to the chosen location" classname="com.hanumanchalisa.counter.domain.usecase.ExportSadhanaUseCaseTest" time="0.001"/>
+  <testcase name="report contains every day and the correct total" classname="com.hanumanchalisa.counter.domain.usecase.ExportSadhanaUseCaseTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Legacy launcher icon for API 24-25, which predate adaptive icons. Composes the same two vectors
+    as the adaptive icon, with the foreground inset so the mace is not clipped by the icon mask.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/ic_launcher_background" />
+    <item
+        android:drawable="@drawable/ic_launcher_foreground"
+        android:left="-14dp"
+        android:top="-14dp"
+        android:right="-14dp"
+        android:bottom="-14dp" />
+</layer-list>

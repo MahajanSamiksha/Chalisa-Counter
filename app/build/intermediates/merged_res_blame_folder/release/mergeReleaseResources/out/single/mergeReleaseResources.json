@@ -1,0 +1,38 @@
+[
+    {
+        "merged": "com.hanumanchalisa.counter.app-release-40:/drawable_ic_launcher_background.xml.flat",
+        "source": "com.hanumanchalisa.counter.app-main-41:/drawable/ic_launcher_background.xml"
+    },
+    {
+        "merged": "com.hanumanchalisa.counter.app-release-40:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.hanumanchalisa.counter.app-main-41:/drawable/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "com.hanumanchalisa.counter.app-release-40:/mipmap-anydpi_ic_launcher_round.xml.flat",
+        "source": "com.hanumanchalisa.counter.app-main-41:/mipmap-anydpi/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.hanumanchalisa.counter.app-release-40:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.hanumanchalisa.counter.app-main-41:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.hanumanchalisa.counter.app-release-40:/drawable_ic_launcher_monochrome.xml.flat",
+        "source": "com.hanumanchalisa.counter.app-main-41:/drawable/ic_launcher_monochrome.xml"
+    },
+    {
+        "merged": "com.hanumanchalisa.counter.app-release-40:/xml_data_extraction_rules.xml.flat",
+        "source": "com.hanumanchalisa.counter.app-main-41:/xml/data_extraction_rules.xml"
+    },
+    {
+        "merged": "com.hanumanchalisa.counter.app-release-40:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.hanumanchalisa.counter.app-main-41:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "com.hanumanchalisa.counter.app-release-40:/mipmap-anydpi_ic_launcher.xml.flat",
+        "source": "com.hanumanchalisa.counter.app-main-41:/mipmap-anydpi/ic_launcher.xml"
+    },
+    {
+        "merged": "com.hanumanchalisa.counter.app-release-40:/xml_backup_rules.xml.flat",
+        "source": "com.hanumanchalisa.counter.app-main-41:/xml/backup_rules.xml"
+    }
+]
