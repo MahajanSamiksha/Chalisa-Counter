@@ -3,6 +3,7 @@ name: Build APK and AAB
 on:
   push:
     branches:
+      - main
       - 'release/**'
   workflow_dispatch:
 
