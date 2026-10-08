@@ -1,5 +1,6 @@
 package com.hanumanchalisa.counter.presentation.state
 
+import com.hanumanchalisa.counter.domain.importing.ImportPreview
 import com.hanumanchalisa.counter.domain.model.SadhanaProgress
 
 /**
@@ -12,12 +13,19 @@ import com.hanumanchalisa.counter.domain.model.SadhanaProgress
  * @property isResetDialogVisible whether the reset confirmation dialog is showing.
  * @property isExporting whether a file write is in flight, used to disable the export button.
  * @property exportStatus the result of the last export awaiting display, or null when there is none.
+ * @property importPreview what the chosen file would change; non-null while the confirmation dialog
+ *   is showing.
+ * @property isImporting whether a file is being read or its counts written.
+ * @property importStatus the result of the last import awaiting display, or null when there is none.
  */
 data class CounterUiState(
     val progress: SadhanaProgress? = null,
     val isResetDialogVisible: Boolean = false,
     val isExporting: Boolean = false,
     val exportStatus: ExportStatus? = null,
+    val importPreview: ImportPreview? = null,
+    val isImporting: Boolean = false,
+    val importStatus: ImportStatus? = null,
 ) {
     /** True until the first value has been loaded from storage. */
     val isLoading: Boolean get() = progress == null
@@ -29,4 +37,7 @@ data class CounterUiState(
      * recitation is recorded — and while a write is already running.
      */
     val canExport: Boolean get() = !isExporting && (progress?.totalCount ?: 0) > 0
+
+    /** Import needs the current counts loaded, to work out what the file would change. */
+    val canImport: Boolean get() = !isImporting && progress != null
 }

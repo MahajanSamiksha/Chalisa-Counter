@@ -3,6 +3,8 @@ package com.hanumanchalisa.counter.di
 import android.content.Context
 import com.hanumanchalisa.counter.data.export.DocumentTextFileWriter
 import com.hanumanchalisa.counter.data.export.PlainTextSadhanaReportFormat
+import com.hanumanchalisa.counter.data.importing.DocumentTextFileReader
+import com.hanumanchalisa.counter.data.importing.PlainTextSadhanaReportParser
 import com.hanumanchalisa.counter.data.local.ChalisaDatabase
 import com.hanumanchalisa.counter.data.repository.RoomChalisaCountRepository
 import com.hanumanchalisa.counter.data.time.SystemTimeProvider
@@ -13,6 +15,7 @@ import com.hanumanchalisa.counter.domain.model.SadhanaConfig
 import com.hanumanchalisa.counter.domain.repository.ChalisaCountRepository
 import com.hanumanchalisa.counter.domain.usecase.DecrementDayCountUseCase
 import com.hanumanchalisa.counter.domain.usecase.ExportSadhanaUseCase
+import com.hanumanchalisa.counter.domain.usecase.ImportSadhanaUseCase
 import com.hanumanchalisa.counter.domain.usecase.IncrementDayCountUseCase
 import com.hanumanchalisa.counter.domain.usecase.ObserveSadhanaProgressUseCase
 import com.hanumanchalisa.counter.domain.usecase.ResetSadhanaUseCase
@@ -69,6 +72,15 @@ class AppContainer(
             reportFormat = reportFormat,
             fileWriter = textFileWriter,
             timeProvider = timeProvider,
+        )
+    }
+
+    val importSadhana: ImportSadhanaUseCase by lazy {
+        ImportSadhanaUseCase(
+            fileReader = DocumentTextFileReader(appContext),
+            reportParser = PlainTextSadhanaReportParser(),
+            repository = repository,
+            config = config,
         )
     }
 }

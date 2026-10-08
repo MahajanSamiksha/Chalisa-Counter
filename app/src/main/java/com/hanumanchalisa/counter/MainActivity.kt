@@ -49,6 +49,16 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
+                // The system's "open file" dialog, again needing no permission: the app can read only
+                // the one file you pick.
+                val openDocument = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.OpenDocument(),
+                ) { uri ->
+                    if (uri != null) {
+                        viewModel.onImportFileChosen(uri.toString())
+                    }
+                }
+
                 CounterScreen(
                     uiState = uiState,
                     onIncrementDay = viewModel::onIncrementDay,
@@ -60,6 +70,10 @@ class MainActivity : ComponentActivity() {
                         createDocument.launch(viewModel.suggestedExportFileName())
                     },
                     onExportStatusShown = viewModel::onExportStatusShown,
+                    onImportRequested = { openDocument.launch(viewModel.importMimeTypes()) },
+                    onImportConfirmed = viewModel::onImportConfirmed,
+                    onImportDismissed = viewModel::onImportDismissed,
+                    onImportStatusShown = viewModel::onImportStatusShown,
                     onPrivacyPolicyRequested = ::openPrivacyPolicy,
                 )
             }

@@ -19,6 +19,37 @@
     <string name="export_succeeded">Saved to %1$s</string>
     <string name="export_failed">Could not save the file. Your counts are safe — please try again.</string>
 
+    <string name="import_button">Import</string>
+    <string name="import_button_description">Import counts from a file you exported earlier</string>
+    <string name="import_dialog_title">Import counts from this file?</string>
+    <string name="import_dialog_restored_heading">From the file</string>
+    <string name="import_dialog_restored">%1$s across %2$s will be restored.</string>
+    <string name="import_dialog_kept_heading">Kept on this phone</string>
+    <string name="import_dialog_kept">%1$s. The file has no count for these days, so they stay as they are.</string>
+    <string name="import_dialog_replaced_heading">Will be replaced</string>
+    <string name="import_dialog_replaced_intro">These days are counted on this phone and in the file. The count from the file will be used:</string>
+    <string name="import_dialog_replaced_row">Day %1$d: %2$d on this phone → %3$d from the file</string>
+    <string name="import_dialog_total">Total after import: %1$d of %2$d</string>
+    <string name="import_dialog_safety">Days that are not in the file are never cleared. Importing the same file again will not count anything twice.</string>
+    <string name="import_dialog_kept_day">Day %1$d (%2$d)</string>
+    <string name="import_dialog_confirm">Import</string>
+    <string name="import_dialog_cancel">Cancel</string>
+    <plurals name="recitation_count">
+        <item quantity="one">%1$d recitation</item>
+        <item quantity="other">%1$d recitations</item>
+    </plurals>
+    <plurals name="day_count">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <string name="import_succeeded">Counts imported. Your total is now %1$d of %2$d.</string>
+    <string name="import_already_up_to_date">This phone already has the counts from this file. Nothing was changed.</string>
+    <string name="import_not_an_export">This is not a Chalisa Counter export. Choose a file saved with Export. Your counts were not changed.</string>
+    <string name="import_damaged">This file seems edited or incomplete, so it was not imported. Your counts were not changed.</string>
+    <string name="import_nothing_to_import">This file has no recitations to import. Your counts were not changed.</string>
+    <string name="import_unreadable">Could not open the file. Your counts were not changed. Please try again.</string>
+    <string name="import_failed">Could not save the imported counts. Your counts were not changed. Please try again.</string>
+
     <string name="reset_button">Reset all counts</string>
     <string name="reset_dialog_title">Reset all counts?</string>
     <string name="reset_dialog_message">This clears the count for all 40 days and starts a fresh cycle. This cannot be undone. Exported files and existing backups are not deleted.</string>
@@ -33,6 +64,8 @@
     <string name="data_info_backup">Depending on your Android backup settings and device, Android may back up your counts to cloud storage or transfer them to another device. Manage backups through your device settings. Backup storage and retention are managed by your backup provider.</string>
     <string name="data_info_export_title">Optional exports</string>
     <string name="data_info_export">An export is created only when you tap Export and choose where to save it. The text file contains your daily counts, total progress and export date. If you choose a cloud storage provider, that provider may upload and store the file under its own terms and privacy policy.</string>
+    <string name="data_info_import_title">Moving to a new phone</string>
+    <string name="data_info_import">If your counts did not come across with your Android backup, tap Export on the old phone and send the file to yourself (for example by email, Drive or WhatsApp). On the new phone, save the file, tap Import and choose it. Days in the file take the count from the file, and days counted only on the new phone are kept. Before anything changes, you will see exactly what will be restored, kept and replaced. The file is read only on your phone and is not sent anywhere.</string>
     <string name="data_info_deletion_title">Reset and deletion</string>
     <string name="data_info_deletion">Counts stay in app storage until you reset them, clear app storage in Android settings or uninstall the app. Reset clears the counts in the app, but does not delete exported files or existing backups. Delete exported files from the location you chose and manage existing backups with your backup provider. Restoring a backup may restore earlier counts.</string>
     <string name="data_info_close">Close</string>

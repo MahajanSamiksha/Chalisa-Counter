@@ -26,6 +26,7 @@ class CounterViewModelFactory(
             decrementDayCount = container.decrementDayCount,
             resetSadhana = container.resetSadhana,
             exportSadhana = container.exportSadhana,
+            importSadhana = container.importSadhana,
         ) as T
     }
 }

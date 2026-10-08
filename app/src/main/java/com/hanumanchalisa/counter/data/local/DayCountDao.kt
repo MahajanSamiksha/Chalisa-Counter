@@ -1,6 +1,8 @@
 package com.hanumanchalisa.counter.data.local
 
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
@@ -33,6 +35,14 @@ interface DayCountDao {
     /** Decrements only while above zero, so a count can never become negative. */
     @Query("UPDATE day_counts SET `count` = `count` - 1 WHERE day = :day AND `count` > 0")
     suspend fun decrementExisting(day: Int)
+
+    /**
+     * Writes each row's count, overwriting any existing row for that day. Room runs a list insert in
+     * a single transaction, so an import is applied completely or not at all. `REPLACE` is plain
+     * `INSERT OR REPLACE`, which every supported SQLite version understands.
+     */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertAll(rows: List<DayCountEntity>)
 
     @Query("DELETE FROM day_counts")
     suspend fun deleteAll()

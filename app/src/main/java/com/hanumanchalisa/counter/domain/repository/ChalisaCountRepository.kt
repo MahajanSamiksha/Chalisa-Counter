@@ -29,6 +29,12 @@ interface ChalisaCountRepository {
     /** Atomically subtracts one from the count for [day], never going below zero. */
     suspend fun decrementDay(day: Int)
 
+    /**
+     * Sets each of [days] to exactly its given count, in one atomic step, leaving every other day
+     * untouched. Used by import: setting rather than adding is what makes a repeated import harmless.
+     */
+    suspend fun restoreDays(days: List<DayProgress>)
+
     /** Clears every recorded count, returning the whole cycle to zero. */
     suspend fun resetAll()
 }

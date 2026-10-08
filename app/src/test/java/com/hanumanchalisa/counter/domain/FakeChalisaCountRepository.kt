@@ -23,6 +23,9 @@ class FakeChalisaCountRepository(
     var resetCallCount: Int = 0
         private set
 
+    var restoreCallCount: Int = 0
+        private set
+
     override fun observeRecordedDays(): Flow<List<DayProgress>> =
         counts.map { snapshot ->
             snapshot.entries
@@ -42,6 +45,11 @@ class FakeChalisaCountRepository(
         counts.value = counts.value.toMutableMap().apply {
             this[day] = current - 1
         }
+    }
+
+    override suspend fun restoreDays(days: List<DayProgress>) {
+        restoreCallCount++
+        counts.value = counts.value + days.associate { it.day to it.count }
     }
 
     override suspend fun resetAll() {

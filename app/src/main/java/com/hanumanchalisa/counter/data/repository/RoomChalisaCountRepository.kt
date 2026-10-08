@@ -32,6 +32,10 @@ class RoomChalisaCountRepository(
         dao.decrement(day)
     }
 
+    override suspend fun restoreDays(days: List<DayProgress>) {
+        dao.upsertAll(days.map(DayCountMapper::toEntity))
+    }
+
     override suspend fun resetAll() {
         dao.deleteAll()
     }

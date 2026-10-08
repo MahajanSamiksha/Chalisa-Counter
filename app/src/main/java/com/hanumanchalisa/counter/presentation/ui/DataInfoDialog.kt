@@ -40,6 +40,11 @@ fun DataInfoDialog(onDismiss: () -> Unit) {
                 )
                 Text(stringResource(R.string.data_info_export))
                 Text(
+                    stringResource(R.string.data_info_import_title),
+                    style = MaterialTheme.typography.titleSmall,
+                )
+                Text(stringResource(R.string.data_info_import))
+                Text(
                     stringResource(R.string.data_info_deletion_title),
                     style = MaterialTheme.typography.titleSmall,
                 )

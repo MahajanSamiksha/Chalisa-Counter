@@ -1,17 +1,23 @@
 package com.hanumanchalisa.counter.presentation
 
 import com.hanumanchalisa.counter.data.export.PlainTextSadhanaReportFormat
+import com.hanumanchalisa.counter.data.importing.PlainTextSadhanaReportParser
 import com.hanumanchalisa.counter.domain.FakeChalisaCountRepository
 import com.hanumanchalisa.counter.domain.export.FakeTextFileWriter
 import com.hanumanchalisa.counter.domain.export.FixedTimeProvider
+import com.hanumanchalisa.counter.domain.importing.FakeTextFileReader
+import com.hanumanchalisa.counter.domain.model.DayProgress
 import com.hanumanchalisa.counter.domain.model.SadhanaConfig
 import com.hanumanchalisa.counter.domain.repository.ChalisaCountRepository
 import com.hanumanchalisa.counter.domain.usecase.DecrementDayCountUseCase
 import com.hanumanchalisa.counter.domain.usecase.ExportSadhanaUseCase
+import com.hanumanchalisa.counter.domain.usecase.ImportSadhanaUseCase
 import com.hanumanchalisa.counter.domain.usecase.IncrementDayCountUseCase
 import com.hanumanchalisa.counter.domain.usecase.ObserveSadhanaProgressUseCase
 import com.hanumanchalisa.counter.domain.usecase.ResetSadhanaUseCase
+import com.hanumanchalisa.counter.domain.model.SadhanaProgress
 import com.hanumanchalisa.counter.presentation.state.ExportStatus
+import com.hanumanchalisa.counter.presentation.state.ImportStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -44,9 +50,21 @@ class CounterViewModelTest {
         Dispatchers.resetMain()
     }
 
+    private val importLocation = "content://docs/counts.txt"
+
+    /** A file exactly as the app's own export would write it, for the import tests. */
+    private fun exportText(counts: Map<Int, Int>): String = PlainTextSadhanaReportFormat().format(
+        SadhanaProgress(
+            days = config.dayRange.map { DayProgress(day = it, count = counts[it] ?: 0) },
+            config = config,
+        ),
+        exportedAtMillis = 1773471900000L,
+    )
+
     private fun createViewModel(
         repository: ChalisaCountRepository,
         writer: FakeTextFileWriter = FakeTextFileWriter(),
+        importFile: String? = null,
     ) = CounterViewModel(
         observeSadhanaProgress = ObserveSadhanaProgressUseCase(repository, config),
         incrementDayCount = IncrementDayCountUseCase(repository, config),
@@ -56,6 +74,14 @@ class CounterViewModelTest {
             reportFormat = PlainTextSadhanaReportFormat(),
             fileWriter = writer,
             timeProvider = FixedTimeProvider(1773471900000L),
+        ),
+        importSadhana = ImportSadhanaUseCase(
+            fileReader = FakeTextFileReader(
+                importFile?.let { mapOf(importLocation to it) } ?: emptyMap(),
+            ),
+            reportParser = PlainTextSadhanaReportParser(),
+            repository = repository,
+            config = config,
         ),
     )
 
@@ -217,5 +243,206 @@ class CounterViewModelTest {
         advanceUntilIdle()
 
         assertTrue(viewModel.uiState.value.canExport)
+    }
+
+    @Test
+    fun `choosing a file asks for confirmation before changing anything`() = runTest(dispatcher) {
+        val repository = FakeChalisaCountRepository(mapOf(4 to 2))
+        val viewModel = createViewModel(
+            repository,
+            importFile = exportText(mapOf(1 to 5, 2 to 3)),
+        )
+        advanceUntilIdle()
+
+        viewModel.onImportFileChosen(importLocation)
+        advanceUntilIdle()
+
+        val preview = viewModel.uiState.value.importPreview
+        assertEquals(8, preview?.restoredTotal)
+        assertEquals(10, preview?.totalAfterImport)
+        // Counts stay untouched while the dialog is merely open.
+        assertEquals(2, viewModel.uiState.value.progress?.totalCount)
+        assertEquals(0, repository.restoreCallCount)
+    }
+
+    @Test
+    fun `confirming the import restores the file and keeps days it does not mention`() =
+        runTest(dispatcher) {
+            val repository = FakeChalisaCountRepository(mapOf(4 to 2))
+            val viewModel = createViewModel(
+                repository,
+                importFile = exportText(mapOf(1 to 5, 2 to 3)),
+            )
+            advanceUntilIdle()
+
+            viewModel.onImportFileChosen(importLocation)
+            advanceUntilIdle()
+            viewModel.onImportConfirmed()
+            advanceUntilIdle()
+
+            val state = viewModel.uiState.value
+            assertEquals(10, state.progress?.totalCount)
+            assertEquals(5, state.progress?.days?.first { it.day == 1 }?.count)
+            // The day counted only on this phone survives the import.
+            assertEquals(2, state.progress?.days?.first { it.day == 4 }?.count)
+            assertEquals(ImportStatus.Succeeded(totalCount = 10, targetCount = 100), state.importStatus)
+            assertEquals(null, state.importPreview)
+            assertFalse(state.isImporting)
+        }
+
+    @Test
+    fun `cancelling the import changes nothing`() = runTest(dispatcher) {
+        val repository = FakeChalisaCountRepository(mapOf(4 to 2))
+        val viewModel = createViewModel(repository, importFile = exportText(mapOf(1 to 5)))
+        advanceUntilIdle()
+
+        viewModel.onImportFileChosen(importLocation)
+        advanceUntilIdle()
+        viewModel.onImportDismissed()
+        advanceUntilIdle()
+
+        assertEquals(null, viewModel.uiState.value.importPreview)
+        assertEquals(2, viewModel.uiState.value.progress?.totalCount)
+        assertEquals(0, repository.restoreCallCount)
+    }
+
+    @Test
+    fun `a day counted here and in the file is reported before being replaced`() =
+        runTest(dispatcher) {
+            val repository = FakeChalisaCountRepository(mapOf(12 to 1))
+            val viewModel = createViewModel(repository, importFile = exportText(mapOf(12 to 2)))
+            advanceUntilIdle()
+
+            viewModel.onImportFileChosen(importLocation)
+            advanceUntilIdle()
+
+            val replacement = viewModel.uiState.value.importPreview?.replacedDays?.single()
+            assertEquals(12, replacement?.day)
+            assertEquals(1, replacement?.currentCount)
+            assertEquals(2, replacement?.importedCount)
+
+            viewModel.onImportConfirmed()
+            advanceUntilIdle()
+
+            assertEquals(2, viewModel.uiState.value.progress?.totalCount)
+        }
+
+    @Test
+    fun `importing a file whose counts already match says so without a dialog`() =
+        runTest(dispatcher) {
+            val repository = FakeChalisaCountRepository(mapOf(1 to 5))
+            val viewModel = createViewModel(repository, importFile = exportText(mapOf(1 to 5)))
+            advanceUntilIdle()
+
+            viewModel.onImportFileChosen(importLocation)
+            advanceUntilIdle()
+
+            assertEquals(null, viewModel.uiState.value.importPreview)
+            assertEquals(ImportStatus.AlreadyUpToDate, viewModel.uiState.value.importStatus)
+            assertEquals(0, repository.restoreCallCount)
+        }
+
+    @Test
+    fun `importing the same file twice does not count anything twice`() = runTest(dispatcher) {
+        val repository = FakeChalisaCountRepository()
+        val viewModel = createViewModel(repository, importFile = exportText(mapOf(1 to 5, 2 to 3)))
+        advanceUntilIdle()
+
+        viewModel.onImportFileChosen(importLocation)
+        advanceUntilIdle()
+        viewModel.onImportConfirmed()
+        advanceUntilIdle()
+        assertEquals(8, viewModel.uiState.value.progress?.totalCount)
+
+        viewModel.onImportFileChosen(importLocation)
+        advanceUntilIdle()
+
+        // Second time round there is nothing left to change, so no dialog and no double count.
+        assertEquals(ImportStatus.AlreadyUpToDate, viewModel.uiState.value.importStatus)
+        assertEquals(8, viewModel.uiState.value.progress?.totalCount)
+    }
+
+    @Test
+    fun `the wrong kind of file is rejected and the counts are kept`() = runTest(dispatcher) {
+        val repository = FakeChalisaCountRepository(mapOf(1 to 3))
+        val viewModel = createViewModel(repository, importFile = "Shopping list\nMilk\n")
+        advanceUntilIdle()
+
+        viewModel.onImportFileChosen(importLocation)
+        advanceUntilIdle()
+
+        assertEquals(ImportStatus.NotAnExport, viewModel.uiState.value.importStatus)
+        assertEquals(null, viewModel.uiState.value.importPreview)
+        assertEquals(3, viewModel.uiState.value.progress?.totalCount)
+    }
+
+    @Test
+    fun `an edited file is rejected and the counts are kept`() = runTest(dispatcher) {
+        val edited = exportText(mapOf(1 to 5)).replace("Day 1   5", "Day 1   50")
+        val repository = FakeChalisaCountRepository(mapOf(1 to 3))
+        val viewModel = createViewModel(repository, importFile = edited)
+        advanceUntilIdle()
+
+        viewModel.onImportFileChosen(importLocation)
+        advanceUntilIdle()
+
+        assertEquals(ImportStatus.Damaged, viewModel.uiState.value.importStatus)
+        assertEquals(3, viewModel.uiState.value.progress?.totalCount)
+    }
+
+    @Test
+    fun `an unreadable file is reported and the counts are kept`() = runTest(dispatcher) {
+        val repository = FakeChalisaCountRepository(mapOf(1 to 3))
+        // No file registered at the location, so the reader throws.
+        val viewModel = createViewModel(repository, importFile = null)
+        advanceUntilIdle()
+
+        viewModel.onImportFileChosen(importLocation)
+        advanceUntilIdle()
+
+        assertEquals(ImportStatus.Unreadable, viewModel.uiState.value.importStatus)
+        assertEquals(3, viewModel.uiState.value.progress?.totalCount)
+        assertFalse(viewModel.uiState.value.isImporting)
+    }
+
+    @Test
+    fun `an all-zero export has nothing to import`() = runTest(dispatcher) {
+        val viewModel = createViewModel(
+            FakeChalisaCountRepository(),
+            importFile = exportText(emptyMap()),
+        )
+        advanceUntilIdle()
+
+        viewModel.onImportFileChosen(importLocation)
+        advanceUntilIdle()
+
+        assertEquals(ImportStatus.NothingToImport, viewModel.uiState.value.importStatus)
+    }
+
+    @Test
+    fun `import message is cleared once shown`() = runTest(dispatcher) {
+        val viewModel = createViewModel(
+            FakeChalisaCountRepository(),
+            importFile = exportText(emptyMap()),
+        )
+        advanceUntilIdle()
+
+        viewModel.onImportFileChosen(importLocation)
+        advanceUntilIdle()
+        assertTrue(viewModel.uiState.value.importStatus != null)
+
+        viewModel.onImportStatusShown()
+
+        assertEquals(null, viewModel.uiState.value.importStatus)
+    }
+
+    @Test
+    fun `import is available on a fresh install, unlike export`() = runTest(dispatcher) {
+        val viewModel = createViewModel(FakeChalisaCountRepository())
+        advanceUntilIdle()
+
+        // Nothing to export yet, but importing is exactly what a new phone needs.
+        assertFalse(viewModel.uiState.value.canExport)
+        assertTrue(viewModel.uiState.value.canImport)
     }
 }

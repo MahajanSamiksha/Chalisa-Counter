@@ -42,6 +42,7 @@ import com.hanumanchalisa.counter.domain.model.SadhanaConfig
 import com.hanumanchalisa.counter.domain.model.SadhanaProgress
 import com.hanumanchalisa.counter.presentation.state.CounterUiState
 import com.hanumanchalisa.counter.presentation.state.ExportStatus
+import com.hanumanchalisa.counter.presentation.state.ImportStatus
 import com.hanumanchalisa.counter.presentation.ui.theme.HanumanChalisaTheme
 
 /**
@@ -61,6 +62,10 @@ fun CounterScreen(
     onResetDismissed: () -> Unit,
     onExportRequested: () -> Unit,
     onExportStatusShown: () -> Unit,
+    onImportRequested: () -> Unit,
+    onImportConfirmed: () -> Unit,
+    onImportDismissed: () -> Unit,
+    onImportStatusShown: () -> Unit,
     onPrivacyPolicyRequested: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -85,6 +90,35 @@ fun CounterScreen(
         }
         snackbarHostState.showSnackbar(message)
         onExportStatusShown()
+    }
+
+    // Import messages work the same way, and each one states whether the counts changed.
+    val importStatus = uiState.importStatus
+    val importButtonDescription = stringResource(R.string.import_button_description)
+    val importSucceeded = stringResource(
+        R.string.import_succeeded,
+        (importStatus as? ImportStatus.Succeeded)?.totalCount ?: 0,
+        (importStatus as? ImportStatus.Succeeded)?.targetCount ?: 0,
+    )
+    val importUpToDate = stringResource(R.string.import_already_up_to_date)
+    val importNotAnExport = stringResource(R.string.import_not_an_export)
+    val importDamaged = stringResource(R.string.import_damaged)
+    val importNothing = stringResource(R.string.import_nothing_to_import)
+    val importUnreadable = stringResource(R.string.import_unreadable)
+    val importFailed = stringResource(R.string.import_failed)
+    LaunchedEffect(importStatus) {
+        if (importStatus == null) return@LaunchedEffect
+        val message = when (importStatus) {
+            is ImportStatus.Succeeded -> importSucceeded
+            ImportStatus.AlreadyUpToDate -> importUpToDate
+            ImportStatus.NotAnExport -> importNotAnExport
+            ImportStatus.Damaged -> importDamaged
+            ImportStatus.NothingToImport -> importNothing
+            ImportStatus.Unreadable -> importUnreadable
+            ImportStatus.Failed -> importFailed
+        }
+        snackbarHostState.showSnackbar(message)
+        onImportStatusShown()
     }
 
     Scaffold(
@@ -121,33 +155,53 @@ fun CounterScreen(
                 color = MaterialTheme.colorScheme.background,
                 shadowElevation = 8.dp,
             ) {
-                Row(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp, vertical = 12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    // Export is outlined and Reset filled, so the destructive action stays the more
-                    // prominent of the two only in colour — never the easier one to hit by accident.
-                    OutlinedButton(
-                        onClick = onExportRequested,
-                        enabled = uiState.canExport,
-                        modifier = Modifier
-                            .weight(1f)
-                            .semantics {
-                                contentDescription = exportButtonDescription
-                            },
-                    ) {
-                        Text(
-                            text = stringResource(R.string.export_button),
-                            style = MaterialTheme.typography.labelLarge,
-                            modifier = Modifier.padding(vertical = 6.dp),
-                        )
+                    // Export and Import are the pair that moves a practice between phones, so they
+                    // share a row above the destructive action.
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        OutlinedButton(
+                            onClick = onExportRequested,
+                            enabled = uiState.canExport,
+                            modifier = Modifier
+                                .weight(1f)
+                                .semantics {
+                                    contentDescription = exportButtonDescription
+                                },
+                        ) {
+                            Text(
+                                text = stringResource(R.string.export_button),
+                                style = MaterialTheme.typography.labelLarge,
+                                modifier = Modifier.padding(vertical = 6.dp),
+                            )
+                        }
+
+                        OutlinedButton(
+                            onClick = onImportRequested,
+                            enabled = uiState.canImport,
+                            modifier = Modifier
+                                .weight(1f)
+                                .semantics {
+                                    contentDescription = importButtonDescription
+                                },
+                        ) {
+                            Text(
+                                text = stringResource(R.string.import_button),
+                                style = MaterialTheme.typography.labelLarge,
+                                modifier = Modifier.padding(vertical = 6.dp),
+                            )
+                        }
                     }
 
+                    // Reset is filled, so the destructive action stands out in colour while sitting
+                    // on its own row, apart from the everyday buttons.
                     Button(
                         onClick = onResetRequested,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.secondaryContainer,
                             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -196,6 +250,14 @@ fun CounterScreen(
         DataInfoDialog(onDismiss = { isDataInfoVisible = false })
     }
 
+    uiState.importPreview?.let { preview ->
+        ImportConfirmDialog(
+            preview = preview,
+            onConfirm = onImportConfirmed,
+            onDismiss = onImportDismissed,
+        )
+    }
+
     if (uiState.isResetDialogVisible) {
         ResetConfirmDialog(
             onConfirm = onResetConfirmed,
@@ -225,6 +287,10 @@ private fun CounterScreenPreview() {
             onResetDismissed = {},
             onExportRequested = {},
             onExportStatusShown = {},
+            onImportRequested = {},
+            onImportConfirmed = {},
+            onImportDismissed = {},
+            onImportStatusShown = {},
             onPrivacyPolicyRequested = {},
         )
     }
